@@ -21,22 +21,23 @@ public class LocationGenerator
         {
             for (var lat = -90.0; lat <= 90.0; lat += latStep)
             {
-                var alt = 0;//await Elevation.GetElevation(lat, lon);
+                var alt = Elevation.GetElevation(lat, lon);
                 var climateZone = ClimateZone.DetermineClimateZone(lat, lon, alt);
                 var timezone = Timezone.DetermineTimezone(lat, lon);
                 var surfaceType = SurfaceType.DetermineSurfaceType(lat, lon, alt);
+                var depth = DepthCalculator.DetermineDepth(lat, lon, surfaceType);
 
-                var location = $"{Math.Round(lon, 4)} {Math.Round(lat, 4)} {alt} {climateZone} {timezone} {surfaceType}";
-
-                // var location = new Location
-                // {
-                //     Longitude = Math.Round(lon, 4),
-                //     Latitude = Math.Round(lat, 4),
-                //     Altitude = alt,
-                //     ClimateZone = climateZone,
-                //     Timezone = timezone,
-                //     SurfaceType = surfaceType
-                // };
+                var location = new Location
+                {
+                    Longitude = Math.Round(lon, 2),
+                    Latitude = Math.Round(lat, 2),
+                    Altitude = Math.Round(alt, 2),
+                    Depth = depth,
+                    ClimateZone = climateZone,
+                    Timezone = timezone,
+                    SurfaceType = surfaceType,
+                    NaturalFeature = "N_A"
+                };
 
                 var json = JsonSerializer.Serialize(location, new JsonSerializerOptions
                 {
@@ -54,7 +55,7 @@ public class LocationGenerator
 
                 firstEntry = false;
 
-                Console.WriteLine(i+") "+location);
+                Console.WriteLine(i+") "+$"Long:{Math.Round(lon, 4)}\tLat:{Math.Round(lat, 4)}\tAlt:{alt}\tDepth:{depth}\tcz:{climateZone}\ttz:{timezone}\tst:{surfaceType}\tnf:{location.NaturalFeature}");
 
                 i++;
             }
